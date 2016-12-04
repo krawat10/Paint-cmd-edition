@@ -18,12 +18,13 @@ int main(int argc, char *argv[]) {
 	char txt[32] = "kod klawisza: 0x";
 	char file_name[32] = "brak pliku";	
 	char *buf = (char*)malloc(sizeof(char) * 50*20);
+	char *copybuffer = (char*)malloc(sizeof(char) * 50*20);
 	fileopen_init(buf);
 	info.width = 20;
 	info.height =50;
 	char *filename = (char*)malloc(sizeof(char) * 20);
 	fill_name(filename);
-	if (argv[1] != NULL)
+	if (argv[1] != NULL)  //czy otweiramy z linii komend
 	{
 		info.Argv = true;
 		filename = argv[1];
@@ -50,7 +51,7 @@ int main(int argc, char *argv[]) {
 		gotoxy(menu_position, 3);
 		cputs("spacja = zmiana koloru");
 		gotoxy(menu_position, 4);
-		cputs("enter = zmiana koloru tla");
+		cputs("backspace = cofnij");
 		gotoxy(menu_position, 5);
 		cputs("i = wczytanie obrazu domyœlnego");
 		gotoxy(menu_position, 6);
@@ -87,13 +88,15 @@ int main(int argc, char *argv[]) {
 		gotoxy(menu_position, 16);
 		cputs(filename);
 		gotoxy(menu_position, 17);
-		cputs(int_to_array(x));
+		cputs(int_to_array(x));		
 		cputs(":");
 		cputs(int_to_array(y));
 		gotoxy(menu_position, 18);
 		if (stack_memory.used == 0) { cputs("funkcja cofnij niedostepna"); }
 		else { cputs("c = cofnij"); }
 		gotoxy(menu_position, 19);	
+		if (info.active_copy) { cputs("schowek aktywny"); }
+		else { cputs("schowek pusty"); }
 		gotoxy(menu_position, 22);
 		cputs("wymiar:"); cputs(int_to_array(info.width)); cputs(int_to_array(info.height));
 		gotoxy(x, y);
@@ -118,12 +121,11 @@ int main(int argc, char *argv[]) {
 		}
 		else if (zn == 'o') fileopen_path(buf, &stack_memory, filename, &info);
 		else if (zn == 'l') draw_line(buf, x, y, &stack_memory, &info, attr);
-		else if (zn == 8) open_picture_stack(buf, &stack_memory, info.width, info.height);
+		else if (zn == 8) open_picture_stack(buf, &stack_memory, info.width, info.height);  //backspace
 		else if (zn == 'k') draw_rectangle(buf, x, y, &stack_memory, &info, attr);
 		else if (zn == 'n') new_picture(buf, &stack_memory, &info);
-		else if (zn == 'p') info.scrollY++;
-		else if (zn == 'm') info.scrollX++;
-		else if (zn == 'c') open_picture_stack(buf, &stack_memory, info.width, info.height);
+		else if (zn == 'c') copy(buf, x, y, copybuffer, &info);
+		else if (zn == 'p') paste(buf, x, y, copybuffer, &info, &stack_memory);
 		else if (zn == 's') filesave(buf, info, filename);
 		else if (zn == '1') attr = BLACK;
 		else if (zn == '2') attr = BLUE;

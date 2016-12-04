@@ -2,41 +2,75 @@
 #include <stdio.h>
 #include"conio2.h"
 
+
+
 void new_picture(char *buff, wektor *vector, controls* info)
 {
-	//Ponieranie wymiarÛw z klawiatury i wyswietlanie wprowadzanych zmian
+	int width = 0;
+	int height = 0;
+	//Ponieranie wymiar√≥w z klawiatury i wyswietlanie wprowadzanych zmian
 	gotoxy(1, 20);
 	cputs("Podaj szerokosc:");
 	int zn = getch();
-	(*info).width = 10 * (zn - 48);
+	width = 10 * (zn - 48);
 	gotoxy(1, 21);
 	cputs(int_to_array((*info).width));
 	zn = getch();
-	(*info).width += (zn - 48);
+	width += (zn - 48);
+
+	if (width > 20)   //przekroszenie rozmiaru
+	{
+		gotoxy(1, 20);
+		cputs("Za du≈ºy rozmiar");
+		getch();
+		return;
+	}
+	else
+	{
+		(*info).width = width;
+	}
+
 	gotoxy(1, 21);
 	cputs(int_to_array((*info).width));
 	gotoxy(1, 20);
 	cputs("Podaj dlugosc:");
 	zn = getch();
-	(*info).height = 10 * (zn - 48);
+	height = 10 * (zn - 48);
 	gotoxy(4, 21);
 	cputs(int_to_array((*info).height));
 	zn = getch();
-	(*info).height += (zn - 48);
+	height += (zn - 48);
+
+	if (height > 50)  //przekroszenie rozmiaru
+	{
+		gotoxy(1, 20);
+		cputs("Za du≈ºy rozmiar");
+		getch();
+		return;
+	}
+	else
+	{
+		(*info).height = height;
+	}
+
 	gotoxy(4, 21);
 	cputs(int_to_array((*info).height));
-	FILE *file = fopen("start.txt", "r");
+	FILE *file = fopen("start.txt", "r");   //plik z danymi startowymi (czarne t≈Ço)
+
 	for (int i = 0; i < (*info).width * (*info).width; i++)
 	{
 		*(buff + i) = fgetc(file);
 	}
+
 	fclose(file);
+	newVector(vector);  //inicjalizacja funkcji cofnij
 	save_picture_stack(buff, vector, (*info).width, (*info).height);
+	vector->used = 0;	
 }
+
 
 char* int_to_array(int number)
 {
-	//zamiana liczb dziesietnych na wiersz
 	int Aa = number / 10 + 48;
 	int aA = number % 10 + 48;
 	char *Array = (char*)malloc(sizeof(char) * 2);
@@ -46,12 +80,14 @@ char* int_to_array(int number)
 	return Array;
 }
 
+
 void write_picture(char *buff, int start, controls *info)
 {
 	//ustawienie poczatku obrazu
 	int x = 0 + start;
 	int y = 1;
-	//wyswietlanie danych z bufora
+
+
 	for (int i = 0; i < (*info).height*(*info).width; i++, x++)
 	{
 		gotoxy(x, y);
@@ -66,6 +102,7 @@ void write_picture(char *buff, int start, controls *info)
 	}
 }
 
+
 void fill_name(char* filename)
 {
 	for (int i = 0; i < 20; i++)
@@ -75,9 +112,11 @@ void fill_name(char* filename)
 	*(filename + 20) = '\0';
 }
 
-void fileopen(char *buff, wektor *vector, controls *info) //otwieranie przyk≥πdowego pliku
+
+void fileopen(char *buff, wektor *vector, controls *info) //otwieranie przyk≈Çadowego pliku
 {
 	FILE *plik = fopen("test.txt", "r");
+
 	if (plik == NULL)
 	{
 		gotoxy(1, 10);
@@ -87,18 +126,20 @@ void fileopen(char *buff, wektor *vector, controls *info) //otwieranie przyk≥πdo
 	{
 		for (int i = 0; i < 50 * 20; i++)
 		{
-			*(buff + i) = fgetc(plik); //wpisywanie danych do bufora g≥Ûwnego
+			*(buff + i) = fgetc(plik); 
 		}
 	}
+
 	(*info).width = 50;
 	(*info).height = 20;
 	fclose(plik);
-	newVector(vector); 
+	newVector(vector);  //funkcja cofnij
 	save_picture_stack(buff, vector, 50, 20);
 	vector->used = 0;
 }
 
-void fileopen_init(char *buff)
+
+void fileopen_init(char *buff)  //otwieranie obrazu przy otwarciu programu
 {
 	FILE *file = fopen("start.txt", "r");
 	for (int i = 0; i < 50 * 20; i++)
@@ -108,33 +149,38 @@ void fileopen_init(char *buff)
 	fclose(file);
 }
 
-void filesave(char *buff, controls info, char *filename) // zapisywanie obrazka
+
+void filesave(char *buff, controls info, char *filename) 
 {
 	int zn;
 	fill_name(filename);
 	gotoxy(1, 20);
 	cputs("podaj sciezke dostepu:");
 	int i = 0;
+
 	do {
 		zn = getch();
 		gotoxy(1, 21);
 		*(filename + i) = zn;
 		i++;
-		cputs(filename); //wyúwietlanie ciπgu w czasie rzeczywistym
+		cputs(filename); //wy≈õwietlanie ciƒÖgu w czasie rzeczywistym
 	} while (zn != 13);
+
 	*(filename + i - 1) = '\0';
-	if (*(filename + i - 4) == 'b' && *(filename + i - 3) == 'm' && *(filename + i - 2) == 'p')
+
+	if (*(filename + i - 4) == 'b' && *(filename + i - 3) == 'm' && *(filename + i - 2) == 'p')  //jesli plik .bmp
 	{
-		BMPmake(buff, filename, &info);
+		BMPmake(buff, filename, &info);  
 	}
-	if (*(filename + i - 4) == 'x' && *(filename + i - 3) == 'p' && *(filename + i - 2) == 'm')
+
+	else if (*(filename + i - 4) == 'x' && *(filename + i - 3) == 'p' && *(filename + i - 2) == 'm')  //jesli plik .xpm
 	{
-		XPMsave(&info, buff, filename);
+		XPMsave(&info, buff, filename); 
 	}
-	else
+	else   //kodowanie w≈Çasne
 	{
 		FILE *file = fopen(filename, "wb");
-		int Xx = (char)info.width / 10 + 48;  //pierwsze 4 znaki w pliku okreúlajπ wymiary
+		int Xx = (char)info.width / 10 + 48;  //pierwsze 4 znaki w pliku okre≈õlajƒÖ wymiary
 		int xX = info.width % 10 + 48;
 		int Yy = info.height / 10 + 48;
 		int yY = info.height % 10 + 48;
@@ -143,7 +189,7 @@ void filesave(char *buff, controls info, char *filename) // zapisywanie obrazka
 		fputc((char)xX, file);
 		fputc((char)Yy, file);
 		fputc((char)yY, file);
-		for (int i = 0; i < info.height*info.width; i++) //odczyt z bufora g≥Ûwnego
+		for (int i = 0; i < info.height*info.width; i++) 
 		{
 			fputc(*(buff + i), file);
 		}
@@ -152,9 +198,10 @@ void filesave(char *buff, controls info, char *filename) // zapisywanie obrazka
 }
 
 
-void fileopen_path(char *buff, wektor *vector, char *active, controls *info)
+void fileopen_path(char *buff, wektor *vector, char *active, controls *info)  
 {
 	int i = 0;
+
 	if (!(*info).Argv)
 	{
 		int zn;
@@ -180,11 +227,13 @@ void fileopen_path(char *buff, wektor *vector, char *active, controls *info)
 		} while (*(active + i) != '\0');
 		
 	}	
-	char elo[3] = { *(active + i - 4), *(active + i - 3), *(active + i - 2) };
+
+	char elo[3] = { *(active + i - 4), *(active + i - 3), *(active + i - 2) };  
 	gotoxy(1, 21);
 	cputs(active);
 	FILE *file;
 	file = fopen(active, "r");
+
 	if (file == NULL)
 	{
 		gotoxy(1, 10);
@@ -194,12 +243,12 @@ void fileopen_path(char *buff, wektor *vector, char *active, controls *info)
 	}
 	else
 	{
-		if (elo[0] == 'b' && elo[1] == 'm' && elo[2] == 'p')
+		if (elo[0] == 'b' && elo[1] == 'm' && elo[2] == 'p')   // jesli .bmp to zapisz jako bitmape
 		{
 
 			bmpopen_path(buff, vector, active, info, file);
 		}
-		else if (elo[0] == 'x' && elo[1] == 'p' && elo[2] == 'm')
+		else if (elo[0] == 'x' && elo[1] == 'p' && elo[2] == 'm')   // jesli .xpm to zapisz jako xpm
 		{
 
 			XPMload(buff, vector, active, info, file);
@@ -215,16 +264,18 @@ void fileopen_path(char *buff, wektor *vector, char *active, controls *info)
 		}
 	}
 
-	fclose(file);
+	fclose(file);   //inicjalizacja nowego stosu pod funkcje cofnij
 	newVector(vector);
 	save_picture_stack(buff, vector, (*info).width, (*info).height);
 	vector->used = 0;
 }
+
+
 void draw_rectangle(char *buf, int x, int y, wektor *vector, controls *info, int color)
 {
 	int zn = 0;
-	int start_X = x;
-	int start_Y = y;
+	int start_X = x;  //pozycje startowe
+	int start_Y = y;  //pozycje startowe
 	bool poziom;
 	bool pion;
 	int absoluteX;
@@ -240,26 +291,26 @@ void draw_rectangle(char *buf, int x, int y, wektor *vector, controls *info, int
 		write_picture(buf, picture_position, info);
 		poziom = (start_X <= x);
 		pion = (start_Y <= y);
-		absoluteX = poziom ? x - start_X : start_X - x;
-		absoluteY = pion ? y - start_Y : start_Y - y;
+		absoluteX = poziom ? x - start_X : start_X - x; 
+		absoluteY = pion ? y - start_Y : start_Y - y;   
 
-		for (int posY = 0; posY < (absoluteY + 1); posY++)
+		for (int posY = 0; posY < (absoluteY + 1); posY++)  //petla na osi Y
 		{
-			for (int posX = 0; posX < (absoluteX + 1); posX++)
+			for (int posX = 0; posX < (absoluteX + 1); posX++) //rysowanie 'x' na osi X 
 			{
-				if (pion && poziom)gotoxy(start_X + posX, start_Y + posY);
-				if (!pion && poziom)gotoxy(start_X + posX, start_Y - posY);
-				if (pion && !poziom)gotoxy(start_X - posX, start_Y + posY);
-				if (!pion && !poziom)gotoxy(start_X - posX, start_Y - posY);
+				if (pion && poziom)gotoxy(start_X + posX, start_Y + posY);  
+				if (!pion && poziom)gotoxy(start_X + posX, start_Y - posY); 
+				if (pion && !poziom)gotoxy(start_X - posX, start_Y + posY); 
+				if (!pion && !poziom)gotoxy(start_X - posX, start_Y - posY); 
 				cputs("x");
 			}
 		}
 		zn = getch();
-	} while (zn != 'k');
+	} while (zn != 'k'); //dop√≥ki nie zatwierdzimy przyciskiem k to dalej rysujemy
 	if (zn == 27)return;
 	for (int posY = 0; posY < (absoluteY + 1); posY++)
 	{
-		for (int posX = 0; posX < (absoluteX + 1); posX++)
+		for (int posX = 0; posX < (absoluteX + 1); posX++) //zapisywanie w g≈Ç√≥wnym buforze.
 		{
 			if (pion && poziom)*(buf + ((*info).width*(start_Y + posY - 1) + (start_X + posX - picture_position))) = color;
 			if (!pion && poziom)*(buf + ((*info).width*(start_Y - posY - 1) + (start_X + posX - picture_position))) = color;
@@ -268,7 +319,7 @@ void draw_rectangle(char *buf, int x, int y, wektor *vector, controls *info, int
 			cputs("x");
 		}
 	}
-	save_picture_stack(buf, vector, (*info).width, (*info).height);
+	save_picture_stack(buf, vector, (*info).width, (*info).height); //zapisanie do bufora "cofnij"
 }
 void draw_line(char *buf, int x, int y, wektor *vector, controls *info, int color)
 {
@@ -285,22 +336,22 @@ void draw_line(char *buf, int x, int y, wektor *vector, controls *info, int colo
 		else if (zn == 0x50) y++;
 		else if (zn == 0x4b) x--;
 		else if (zn == 0x4d) x++;
-		else if (zn == 27) return;
+		else if (zn == 27) return;  //wyjscie esc
 		gotoxy(x, y);
 		write_picture(buf, picture_position, info);
 		poziom = (start_X <= x);
 		pion = (start_Y <= y);
-		absoluteX = poziom ? x - start_X : start_X - x;
-		absoluteY = pion ? y - start_Y : start_Y - y;
+		absoluteX = poziom ? x - start_X : start_X - x; 
+		absoluteY = pion ? y - start_Y : start_Y - y; 
 
 		if (absoluteX >= absoluteY)
 		{
 			for (int posX = 0; posX < (absoluteX + 1); posX++)
 			{
 				if (absoluteX != 0) {
-					if (pion && poziom)gotoxy(start_X + posX, start_Y + ((absoluteY)* (posX)) / (absoluteX));
-					if (!pion && poziom)gotoxy(start_X + posX, start_Y - ((absoluteY)* (posX)) / (absoluteX));
-					if (pion && !poziom)gotoxy(start_X - posX, start_Y + ((absoluteY)* (posX)) / (absoluteX));
+					if (pion && poziom)gotoxy(start_X + posX, start_Y + ((absoluteY)* (posX)) / (absoluteX)); 
+					if (!pion && poziom)gotoxy(start_X + posX, start_Y - ((absoluteY)* (posX)) / (absoluteX));//po≈Ço≈ºenie y okresla sie z zale≈ºno≈õci prostej
+					if (pion && !poziom)gotoxy(start_X - posX, start_Y + ((absoluteY)* (posX)) / (absoluteX));//czyli y=a*x gdzie a to szerokosc Y / szerokosc X
 					if (!pion && !poziom)gotoxy(start_X - posX, start_Y - ((absoluteY)* (posX)) / (absoluteX));
 				}
 				else
@@ -310,12 +361,12 @@ void draw_line(char *buf, int x, int y, wektor *vector, controls *info, int colo
 				cputs("x");
 			}
 		}
-		if (absoluteY > absoluteX)
+		if (absoluteY > absoluteX)  // ten przypadek wystepuje gdy szerokosc Y jest wieksza
 		{
 			for (int posY = 0; posY < (absoluteY + 1); posY++)
 			{
 				if (absoluteY != 0) {
-					if (pion && poziom)gotoxy(start_X + ((absoluteX * posY) / absoluteY), start_Y + posY);
+					if (pion && poziom)gotoxy(start_X + ((absoluteX * posY) / absoluteY), start_Y + posY); //podobna zale≈ºnosc
 					if (!pion && poziom)gotoxy(start_X + ((absoluteX * posY) / absoluteY), start_Y - posY);
 					if (pion && !poziom)gotoxy(start_X - ((absoluteX * posY) / absoluteY), start_Y + posY);
 					if (!pion && !poziom)gotoxy(start_X - ((absoluteX * posY) / absoluteY), start_Y - posY);

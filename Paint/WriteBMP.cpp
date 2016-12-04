@@ -3,55 +3,56 @@
 #include <string.h>
 #include"conio2.h"
 
-unsigned char bitmap[1000];
+
 void BMPmake(char* buf, char *active, controls *t)
 {
-
-	bitmap[0] = 'B';
-	bitmap[1] = 'M';
-	bitmap[2] = 54 + (*t).height*(*t).width*3; // + sizeofpicture	(pixel * 3)
-	for (int i = 3; i < 10; i++) bitmap[i] = 0;
-	bitmap[10] = 54;
-	for (int i = 11; i < 14; i++) bitmap[i] = 0;
-	bitmap[14] = 40;
-	for (int i = 15; i < 18; i++) bitmap[i] = 0;
-	bitmap[18] = (*t).width; 
-	for (int i = 19; i < 22; i++) bitmap[i] = 0;
-	bitmap[22] = (*t).height; 
-	for (int i = 23; i < 26; i++) bitmap[i] = 0;
-	bitmap[26] = 1;
-	bitmap[27] = 0;
-	bitmap[28] = 24; 
-	for (int i = 29; i < 34; i++) bitmap[i] = 0;
-	bitmap[34] = (*t).height*(*t).width * 3; 
-	for (int i = 35; i < 40; i++) bitmap[i] = 0;
-	bitmap[40] = 48;
-	bitmap[41] = 177;
-	bitmap[42] = 0;
-	bitmap[43] = 0;
-	bitmap[44] = 48;
-	bitmap[45] = 177;
-	for (int i = 46; i < 54; i++) bitmap[i] = 0;
+	unsigned char bmpBuffer[54 + 50 * 20 * 3] = {};
+	//unsigned char *bmpBuffer = (unsigned char*)malloc(sizeof(char) * 50 * 20);
+	bmpBuffer[0] = 'B';
+	bmpBuffer[1] = 'M';
+	bmpBuffer[2] = 54 + (*t).height*(*t).width*3; // + wymiary pliku (pixel * 3)
+	for (int i = 3; i < 10; i++) bmpBuffer[i] = 0;
+	bmpBuffer[10] = 54;
+	for (int i = 11; i < 14; i++) bmpBuffer[i] = 0;
+	bmpBuffer[14] = 40;
+	for (int i = 15; i < 18; i++) bmpBuffer[i] = 0;
+	bmpBuffer[18] = (*t).width; 
+	for (int i = 19; i < 22; i++) bmpBuffer[i] = 0;
+	bmpBuffer[22] = (*t).height; 
+	for (int i = 23; i < 26; i++) bmpBuffer[i] = 0;
+	bmpBuffer[26] = 1;
+	bmpBuffer[27] = 0;
+	bmpBuffer[28] = 24; 
+	for (int i = 29; i < 34; i++) bmpBuffer[i] = 0;
+	bmpBuffer[34] = (*t).height*(*t).width * 3; 
+	for (int i = 35; i < 40; i++) bmpBuffer[i] = 0;
+	bmpBuffer[40] = 48;
+	bmpBuffer[41] = 177;
+	bmpBuffer[42] = 0;
+	bmpBuffer[43] = 0;
+	bmpBuffer[44] = 48;
+	bmpBuffer[45] = 177;
+	for (int i = 46; i < 54; i++) bmpBuffer[i] = 0;
 	int c = 0;
 	for (int i = (54 + (*t).height*(*t).width * 3 - 3), k = 1,  counter = 1 ; i >= 54 ; i = i - 3, counter++)
 	{		
-		c = k*(*t).width - counter;
-			if (*(buf + c) == WHITE) { bitmap[i + 2] = 255; bitmap[i + 1] = 255; bitmap[i] = 255; }
-			else if (*(buf + c) == BLACK) { bitmap[i + 2] = 0; bitmap[i + 1] = 0; bitmap[i] = 0; }
-			else if (*(buf + c) == BLUE) { bitmap[i + 2] = 0; bitmap[i + 1] = 0; bitmap[i] = 255; }
-			else if (*(buf + c) == GREEN) { bitmap[i + 2] = 0; bitmap[i + 1] = 128; bitmap[i] = 0; }
-			else if (*(buf + c) == CYAN) { bitmap[i + 2] = 0; bitmap[i + 1] = 255; bitmap[i] = 255; }
-			else if (*(buf + c) == RED) { bitmap[i + 2] = 255; bitmap[i + 1] = 0; bitmap[i] = 0; }
-			else if (*(buf + c) == MAGENTA) { bitmap[i + 2] = 255; bitmap[i + 1] = 0; bitmap[i] = 255; }
-			else if (*(buf +  c) == BROWN) { bitmap[i + 2] = 165; bitmap[i + 1] = 42; bitmap[i] = 42; }
-			else if (*(buf +  c) == LIGHTGRAY) { bitmap[i + 2] = 211; bitmap[i + 1] = 211; bitmap[i] = 211; }
-			else if (*(buf +  c) == DARKGRAY) { bitmap[i + 2] = 169; bitmap[i + 1] = 169; bitmap[i] = 169; }
-			else if (*(buf +  c) == LIGHTBLUE) { bitmap[i + 2] = 173; bitmap[i + 1] = 216; bitmap[i] = 230; }
-			else if (*(buf +  c) == LIGHTGREEN) { bitmap[i + 2] = 144; bitmap[i + 1] = 238; bitmap[i] = 144; }
-			else if (*(buf +  c) == LIGHTCYAN) { bitmap[i + 2] = 224; bitmap[i + 1] = 255; bitmap[i] = 255; }
-			else if (*(buf +  c) == LIGHTRED) { bitmap[i + 2] = 255; bitmap[i + 1] = 204; bitmap[i] = 203; }
-			else if (*(buf +  c) == LIGHTMAGENTA) { bitmap[i + 2] = 255; bitmap[i + 1] = 119; bitmap[i] = 255; }
-			else if (*(buf +  c) == YELLOW) { bitmap[i + 2] = 255; bitmap[i + 1] = 255; bitmap[i] = 0; }
+		c = k*(*t).width - counter; //zapisywanie obrazu w bmp jest od dolnego rogu obrazu
+			if (*(buf + c) == WHITE) { bmpBuffer[i + 2] = 254; bmpBuffer[i + 1] = 254; bmpBuffer[i] = 254; } // kolory zapisywanie nie RGB tylko BGR
+			else if (*(buf + c) == BLACK) { bmpBuffer[i + 2] = 1; bmpBuffer[i + 1] = 1; bmpBuffer[i] = 1; }
+			else if (*(buf + c) == BLUE) { bmpBuffer[i + 2] = 0; bmpBuffer[i + 1] = 0; bmpBuffer[i] = 255; }
+			else if (*(buf + c) == GREEN) { bmpBuffer[i + 2] = 0; bmpBuffer[i + 1] = 128; bmpBuffer[i] = 0; }
+			else if (*(buf + c) == CYAN) { bmpBuffer[i + 2] = 0; bmpBuffer[i + 1] = 255; bmpBuffer[i] = 255; }
+			else if (*(buf + c) == RED) { bmpBuffer[i + 2] = 255; bmpBuffer[i + 1] = 0; bmpBuffer[i] = 0; }
+			else if (*(buf + c) == MAGENTA) { bmpBuffer[i + 2] = 255; bmpBuffer[i + 1] = 0; bmpBuffer[i] = 255; }
+			else if (*(buf +  c) == BROWN) { bmpBuffer[i + 2] = 165; bmpBuffer[i + 1] = 42; bmpBuffer[i] = 42; }
+			else if (*(buf +  c) == LIGHTGRAY) { bmpBuffer[i + 2] = 211; bmpBuffer[i + 1] = 211; bmpBuffer[i] = 211; }
+			else if (*(buf +  c) == DARKGRAY) { bmpBuffer[i + 2] = 169; bmpBuffer[i + 1] = 169; bmpBuffer[i] = 169; }
+			else if (*(buf +  c) == LIGHTBLUE) { bmpBuffer[i + 2] = 173; bmpBuffer[i + 1] = 216; bmpBuffer[i] = 230; }
+			else if (*(buf +  c) == LIGHTGREEN) { bmpBuffer[i + 2] = 144; bmpBuffer[i + 1] = 238; bmpBuffer[i] = 144; }
+			else if (*(buf +  c) == LIGHTCYAN) { bmpBuffer[i + 2] = 224; bmpBuffer[i + 1] = 255; bmpBuffer[i] = 255; }
+			else if (*(buf +  c) == LIGHTRED) { bmpBuffer[i + 2] = 255; bmpBuffer[i + 1] = 204; bmpBuffer[i] = 203; }
+			else if (*(buf +  c) == LIGHTMAGENTA) { bmpBuffer[i + 2] = 255; bmpBuffer[i + 1] = 119; bmpBuffer[i] = 255; }
+			else if (*(buf +  c) == YELLOW) { bmpBuffer[i + 2] = 255; bmpBuffer[i + 1] = 255; bmpBuffer[i] = 0; }
 			c++;
 			if (counter == (*t).width)
 			{
@@ -64,7 +65,7 @@ void BMPmake(char* buf, char *active, controls *t)
 	file = fopen(active, "w+");	
 	for (int i = 0; i < (54 + (*t).height*(*t).width*3); i++)
 	{
-		fputc(bitmap[i], file);
+		fputc(bmpBuffer[i], file);
 	}
 	fclose(file);
 }
@@ -90,7 +91,7 @@ void bmpopen_path(char *buff, wektor *vector, char *active, controls *info, FILE
 	{
 		getc(pFile);
 	}
-	for (int i = 0; i < SizeX*sizeY; i++)
+	for (int i = 0; i < SizeX*sizeY; i++) //odczyt kolorów pikseli
 	{
 		bmpBuffer[i][2] = getc(pFile);
 		bmpBuffer[i][1] = getc(pFile);
